@@ -143,7 +143,7 @@ def annot_parser(fh, compression, frqfile_full=None, compression_frq=None):
     df_annot = read_csv(fh, header=0, compression=compression).drop(['SNP', 'CHR', 'BP', 'CM'], axis=1, errors='ignore').astype(float)
     if frqfile_full is not None:
         df_frq = frq_parser(frqfile_full, compression_frq)
-        df_annot = df_annot[(.95 > df_frq.FRQ) & (df_frq.FRQ > 0.05)]
+        df_annot = df_annot[((.95 > df_frq.FRQ) & (df_frq.FRQ > 0.05)).values]
     return df_annot
 
 def frq_parser(fh, compression):
