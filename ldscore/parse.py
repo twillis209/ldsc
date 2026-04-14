@@ -10,8 +10,6 @@ import numpy as np
 import pandas as pd
 import os
 import glob
-import gzip
-import warnings
 
 def series_eq(x, y):
     '''Compare series, return False if lengths not equal.'''
@@ -19,30 +17,9 @@ def series_eq(x, y):
 
 def read_csv(fh, **kwargs):
     '''Read CSV file with optional compression handling.'''
-    #print(fh)
     if fh.endswith('.gz'):
-        try:
-            f = gzip.open(fh, 'rt')
-            #print(f)
-           
-            try:
-                with warnings.catch_warnings(record=True) as w:
-                    warnings.simplefilter("always")
-                    df = pd.read_csv(f, sep=r'\s+', na_values='.', **kwargs)
-                    if any("compression has no effect" in str(warning.message) for warning in w):
-                        print(f"RuntimeWarning: compression has no effect when passing a non-binary object as input for file {fh}")
-                        #return (f"An error occurred while reading the file {fh} with pandas: {e}")
-                #print(f"DataFrame shape: {df.shape}")  # Print the shape of the DataFrame
-                return df
-         
-            except Exception as e:
-                print(f"An error occurred while reading the file {fh} with pandas: {e}")
-                return (f"An error occurred while reading the file {fh} with pandas: {e}")
-        except Exception as e:
-            print(f"An error occurred while reading the file {fh}: {e}")
-            return None
-    else:
-        return pd.read_csv(fh,  sep='\s+', na_values='.', **kwargs)
+        kwargs['compression'] = 'gzip'
+    return pd.read_csv(fh, sep=r'\s+', na_values='.', **kwargs)
 
 def sub_chr(s, chrom):
     '''Substitute chr for @, else append chr to the end of str.'''
