@@ -140,10 +140,17 @@ def l2_parser(fh, compression):
 
 def annot_parser(fh, compression, frqfile_full=None, compression_frq=None):
     '''Parse annot files'''
-    df_annot = read_csv(fh, header=0, compression=compression).drop(['SNP', 'CHR', 'BP', 'CM'], axis=1, errors='ignore').astype(float)
+    df_annot = read_csv(fh, header=0, compression=compression)
     if frqfile_full is not None:
         df_frq = frq_parser(frqfile_full, compression_frq)
-        df_annot = df_annot[((.95 > df_frq.FRQ) & (df_frq.FRQ > 0.05)).values]
+        # Merge on SNP so that differing SNP sets between annot and frq files
+        # are handled correctly (avoids pandas index alignment warning and
+        # numpy boolean-length ValueError from positional filtering).
+        if 'SNP' in df_annot.columns:
+            df_annot = df_annot.merge(df_frq[['SNP', 'FRQ']], on='SNP', how='inner')
+            df_annot = df_annot[(.95 > df_annot['FRQ']) & (df_annot['FRQ'] > 0.05)]
+            df_annot = df_annot.drop(['FRQ'], axis=1)
+    df_annot = df_annot.drop(['SNP', 'CHR', 'BP', 'CM'], axis=1, errors='ignore').astype(float)
     return df_annot
 
 def frq_parser(fh, compression):
