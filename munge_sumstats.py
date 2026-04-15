@@ -228,8 +228,8 @@ def parse_dat(dat_gen, convert_colname, merge_alleles, log, args):
         sys.stdout.write('.')
         tot_snps += len(dat)
         old = len(dat)
-        dat = dat.dropna(axis=0, how="any", subset=filter(
-            lambda x: x != 'INFO', dat.columns)).reset_index(drop=True)
+        dat = dat.dropna(axis=0, how="any", subset=list(filter(
+            lambda x: x != 'INFO', dat.columns))).reset_index(drop=True)
         drops['NA'] += old - len(dat)
         dat.columns = map(lambda x: convert_colname[x], dat.columns)
 
