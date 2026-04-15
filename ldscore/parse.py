@@ -16,9 +16,8 @@ def series_eq(x, y):
     return len(x) == len(y) and (x == y).all()
 
 def read_csv(fh, **kwargs):
-    '''Read CSV file with optional compression handling.'''
-    if fh.endswith('.gz'):
-        kwargs['compression'] = 'gzip'
+    '''Read CSV file, inferring compression from the file extension.'''
+    kwargs['compression'] = 'infer'
     return pd.read_csv(fh, sep=r'\s+', na_values='.', **kwargs)
 
 def sub_chr(s, chrom):
